@@ -43,6 +43,26 @@ def get_orders_by_id(order_id):
         return f'{e}'
 
 
+@app.route('/offers/', method=['GET'])
+def get_offers():
+    """Возвращает весь список пользователей"""
+    try:
+        offers = db.session.query(Offer).all()
+        return jsonify([offer.get_offer() for offer in offers])
+    except Exception as e:
+        return f'{e}'
+
+
+@app.route('/offers/<int:order_id>', method=['GET'])
+def get_offers_by_id(offer_id):
+    """Возвращает весь список пользователей"""
+    try:
+        offers = db.session.query(Offer).filter(Offer.id == offer_id).first()
+        return jsonify([offer.get_offer() for offer in offers])
+    except Exception as e:
+        return f'{e}'
+
+
 @app.errorhandler(404)
 def route_not_found(error):
     return f"Такой страницы нет {error}", 404
