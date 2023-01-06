@@ -1,5 +1,13 @@
-from flask import render_template
-from config import app
+from flask import render_template, jsonify
+from config import app, db
+from models import User, Offer, Order
+
+
+@app.route('/users/', method=['GET'])
+def get_users():
+    """Возвращает весь список пользователей"""
+    users = db.session.query(User).all()
+    return jsonify([user.serialize() for user in users])
 
 
 @app.errorhandler(404)
