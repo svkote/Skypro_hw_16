@@ -1,28 +1,56 @@
-from flask import render_template, jsonify
+from flask import render_template, jsonify, request
 from config import app, db
 from migrate import init_database
 from models import User, Offer, Order
 
 
-@app.route('/users/', methods=['GET'])
+@app.route('/users/', methods=['GET', 'POST'])
 def get_users():
     """Возвращает весь список пользователей"""
-    try:
-        users = db.session.query(User).all()
-        return jsonify([user.serialize() for user in users])
-    except Exception as e:
-        return f'{e}'
+    if request.method == 'GET':
+        try:
+            users = db.session.query(User).all()
+            return jsonify([user.serialize() for user in users])
+        except Exception as e:
+            return f'{e}'
+    elif request.method == 'POST':
+        data = request.json
+        with db.session.begin():
+            db.session.add(User(**data))
+        return 'Успешно добавлен'
 
 
-@app.route('/users/<int:user_id>', methods=['GET'])
+@app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
 def get_users_by_id(user_id):
     """Возвращает весь список пользователей"""
-    try:
+    if request.method == 'GET':
+        try:
+            user = db.session.query(User).filter(User.id == user_id).first()
+            print(user.serialize())
+            return jsonify(user.serialize())
+        except Exception as e:
+            return f'{e}'
+    elif request.method == 'PUT':
+        data = request.json
         user = db.session.query(User).filter(User.id == user_id).first()
-        print(user.serialize())
-        return jsonify(user.serialize())
-    except Exception as e:
-        return f'{e}'
+
+        if user is None:
+            with db.session.begin():
+                db.session.add(User(**data))
+            return 'Успешно добавлен'
+        else:
+            with db.session.begin():
+                db.session.query(User).filter(User.id == user_id).update(request.json)
+            return 'Успешно обновлен'
+    elif request.method == 'DELETE':
+        user = db.session.query(User).filter(User.id == user_id).first()
+
+        if user is None:
+            return 'Не найден'
+        else:
+            with db.session.begin():
+                db.session.query(User).filter(User.id == user_id).delete()
+            return 'Успешно обновлен'
 
 
 @app.route('/orders/', methods=['GET'])

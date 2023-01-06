@@ -21,22 +21,21 @@ def insert_data_user(input_data):
 
 
 def insert_data_order(input_data):
-    # with db.session.begin():
-    for row in input_data:
-        db.session.add(
-            Order(
-                id=row.get('id'),
-                name=row.get('name'),
-                description=row.get('description'),
-                start_date=row.get('start_date'),
-                end_date=row.get('end_date'),
-                address=row.get('address'),
-                price=row.get('price'),
-                customer_id=row.get('customer_id'),
-                executor_id=row.get('executor_id')
+    with db.session.begin():
+        for row in input_data:
+            db.session.add(
+                Order(
+                    id=row.get('id'),
+                    name=row.get('name'),
+                    description=row.get('description'),
+                    start_date=row.get('start_date'),
+                    end_date=row.get('end_date'),
+                    address=row.get('address'),
+                    price=row.get('price'),
+                    customer_id=row.get('customer_id'),
+                    executor_id=row.get('executor_id')
+                )
             )
-        )
-    db.session.commit()
 
 
 def insert_data_offer(input_data):
