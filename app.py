@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, request
+from flask import jsonify, request
 from config import app, db
 from migrate import init_database
 from models import User, Offer, Order
